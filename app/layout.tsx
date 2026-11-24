@@ -40,8 +40,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body>
-        <PWAManifestInjector />
-        <PWARegistrar />
+        </* <PWAManifestInjector /> */>
+        </*<PWARegistrar />*/>
         <CSSImportEnhancer />
         <ChatPluginBootstrap />
         <ChatReasoningVisibilityController />
