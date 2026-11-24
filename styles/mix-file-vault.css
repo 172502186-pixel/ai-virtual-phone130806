@@ -1,0 +1,113 @@
+/* styles/mix-file-vault.css */
+.mix-file-vault-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 72vh;
+  overflow-y: auto;
+  color: var(--color-text, #e2e8f0);
+}
+
+.mix-fv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mix-fv-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--color-bg-secondary, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mix-fv-item:hover {
+  border-color: var(--color-primary, #3b82f6);
+  background: var(--color-bg-secondary-hover, rgba(255, 255, 255, 0.08));
+}
+
+.mix-fv-item-title {
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mix-fv-item-meta {
+  font-size: 11px;
+  color: var(--color-text-muted, #94a3b8);
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.mix-fv-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.1));
+}
+
+.mix-fv-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mix-fv-target-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mix-fv-target-label {
+  font-size: 12px;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.mix-fv-target-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.mix-fv-target-btn {
+  padding: 8px 10px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-secondary, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  color: var(--color-text, #fff);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.mix-fv-target-btn.active {
+  background: var(--color-primary-dim, rgba(59, 130, 246, 0.2));
+  border-color: var(--color-primary, #3b82f6);
+  color: var(--color-primary, #60a5fa);
+}
+
+.mix-fv-confirm-btn {
+  padding: 10px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-primary, #3b82f6);
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}

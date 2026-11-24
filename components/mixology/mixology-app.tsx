@@ -58,6 +58,8 @@ import { CommentThread, MixologyHall } from "./mixology-hall";
 import { AuthorAvatar, KindGlyph, MatCard, MaterialDetail, MixConfirm, MixTagList, SealedNote, formatMixTime } from "./mixology-shared";
 import { MixConnectorSheet } from "./connector-sheet";
 import { MixSlotEditor } from "./slot-editor";
+import { MixFileVaultModal } from "./mix-file-vault";
+import { FileText } from "lucide-react";
 import { describeMixCondition } from "@/lib/mixology/state";
 
 /** 头像统一压成 192px JPEG dataURL 的小圆图，随发布上云也不占地方 */
@@ -137,6 +139,7 @@ export function MixologyApp({ onClose }: { onClose: () => void }) {
     const [playing, setPlaying] = useState<string | null>(null);
     const [toast, setToast] = useState("");
     const [wheelIndex, setWheelIndex] = useState(0);
+    const [showFileVaultModal, setShowFileVaultModal] = useState(false);
     const wheelRef = useRef<HTMLDivElement | null>(null);
     const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -676,10 +679,22 @@ export function MixologyApp({ onClose }: { onClose: () => void }) {
 
                 {tab === "bar" ? (
                     <>
-                        <div className="mix-subtabs">
-                            <button type="button" data-active={barTab === "create" ? "true" : undefined} onClick={() => setBarTab("create")}>创建配方</button>
-                            <button type="button" data-active={barTab === "mine" ? "true" : undefined} onClick={() => setBarTab("mine")}>
-                                我的配方{recipes.length ? ` · ${recipes.length}` : ""}
+                        <div className="mix-subtabs" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <div style={{ display: "flex", gap: 8 }}>
+                                <button type="button" data-active={barTab === "create" ? "true" : undefined} onClick={() => setBarTab("create")}>创建配方</button>
+                                <button type="button" data-active={barTab === "mine" ? "true" : undefined} onClick={() => setBarTab("mine")}>
+                                    我的配方{recipes.length ? ` · ${recipes.length}` : ""}
+                                </button>
+                            </div>
+                            <button
+                                type="button"
+                                className="mix-pill-btn"
+                                onClick={() => setShowFileVaultModal(true)}
+                                title="从文件库导入长材料"
+                                style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 8px", fontSize: 12 }}
+                            >
+                                <FileText size={13} />
+                                从文件库导入材料
                             </button>
                         </div>
                     {barTab === "create" ? (
@@ -1552,6 +1567,22 @@ export function MixologyApp({ onClose }: { onClose: () => void }) {
             ) : null}
 
             {toast ? <div className="mix-toast">{toast}</div> : null}
+
+            <MixFileVaultModal
+                isOpen={showFileVaultModal}
+                onClose={() => setShowFileVaultModal(false)}
+                onImport={(material, targetSlot) => {
+                    saveMixMaterial(material);
+                    refresh();
+                    if (targetSlot) {
+                        setBarSlots((prev) => ({
+                            ...prev,
+                            [targetSlot]: [{ materialId: material.id }],
+                        }));
+                    }
+                    showToast(`已导入材料《${material.name}》${targetSlot ? "并装入槽位" : ""}`);
+                }}
+            />
         </div>
     );
 }

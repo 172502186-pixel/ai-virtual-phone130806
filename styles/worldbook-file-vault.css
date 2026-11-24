@@ -1,0 +1,111 @@
+/* styles/worldbook-file-vault.css */
+.wb-file-vault-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 72vh;
+  overflow-y: auto;
+  color: var(--color-text, #e2e8f0);
+}
+
+.wb-fv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wb-fv-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--color-bg-secondary, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.wb-fv-item:hover {
+  border-color: var(--color-primary, #3b82f6);
+  background: var(--color-bg-secondary-hover, rgba(255, 255, 255, 0.08));
+}
+
+.wb-fv-item-title {
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-fv-item-meta {
+  font-size: 11px;
+  color: var(--color-text-muted, #94a3b8);
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.wb-fv-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.1));
+}
+
+.wb-fv-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wb-fv-entry-card {
+  padding: 8px 10px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-secondary, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wb-fv-entry-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.wb-fv-key-tag {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--color-primary-dim, rgba(59, 130, 246, 0.2));
+  color: var(--color-primary, #60a5fa);
+}
+
+.wb-fv-entry-text-snippet {
+  font-size: 12px;
+  color: var(--color-text-muted, #94a3b8);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wb-fv-import-btn {
+  padding: 10px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-primary, #3b82f6);
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}

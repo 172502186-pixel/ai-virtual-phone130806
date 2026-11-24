@@ -647,3 +647,40 @@ export async function parsePdfPageRange(
         chunks: [...chunkMap.values()].sort((a, b) => a.startPage - b.startPage),
     };
 }
+
+/**
+ * PDF 全文抽取（基于 PDF.js）
+ * @returns { text: string; totalPages: number }
+ */
+export async function extractPdfPlainText(
+    buffer: ArrayBuffer,
+    options?: { onProgress?: (ratio: number) => void },
+): Promise<{ text: string; totalPages: number }> {
+    const pdfjs = await loadPdfjs();
+    const pdf = await pdfjs.getDocument({ data: buffer }).promise;
+    const totalPages = pdf.numPages;
+    const texts: string[] = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const items = content.items as Array<{ str: string; hasEOL?: boolean }>;
+        const pageText = items.map(item => item.str).join(" ");
+        texts.push(pageText);
+
+        if (options?.onProgress) {
+            options.onProgress(i / totalPages);
+        }
+    }
+
+    try {
+        await pdf.destroy?.();
+    } catch {
+        // ignore
+    }
+
+    return {
+        text: texts.join("\n"),
+        totalPages,
+    };
+}

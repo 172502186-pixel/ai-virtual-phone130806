@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { AlertCircle, ChevronLeft, Code, Image as ImageIcon, MessageSquare, MoreHorizontal, RotateCcw, Sparkles, Trash2, UserRound } from "lucide-react";
+import { AlertCircle, ChevronLeft, Code, FileText, Image as ImageIcon, MessageSquare, MoreHorizontal, RotateCcw, Sparkles, Trash2, UserRound } from "lucide-react";
+import { ChatDocImport, ChatDocAttachmentPendingBar } from "@/components/chat/chat-doc-import";
+import { resolveAttachmentText, type ChatDocAttachment } from "@/lib/chat-document-import";
 import { PageShell } from "@/components/ui/page-shell";
 import { ConfirmDialog } from "@/components/ui/modal";
 import { MediaPreviewOverlay } from "@/components/chat/media-preview-overlay";
@@ -462,6 +464,8 @@ export function MascotChatRoom({ onBack, onDeleted }: MascotChatRoomProps) {
     const [backgroundUrl, setBackgroundUrl] = useState("");
     const [inputText, setInputText] = useState("");
     const [pendingImages, setPendingImages] = useState<string[]>([]);
+    const [pendingDocAttachment, setPendingDocAttachment] = useState<ChatDocAttachment | null>(null);
+    const [showDocImport, setShowDocImport] = useState(false);
     const [imagePreviewCache, setImagePreviewCache] = useState<Record<string, string>>({});
     const [showEmojiPanel, setShowEmojiPanel] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
@@ -686,13 +690,25 @@ export function MascotChatRoom({ onBack, onDeleted }: MascotChatRoomProps) {
             return;
         }
         const text = inputText.trim();
-        if (!text && pendingImages.length === 0) return;
+        if (!text && pendingImages.length === 0 && !pendingDocAttachment) return;
         setInputText("");
         textareaRef.current?.style.setProperty("height", "auto");
         const images = pendingImages;
         setPendingImages([]);
+        const att = pendingDocAttachment;
+        setPendingDocAttachment(null);
         setShowEmojiPanel(false);
-        await sendMascotMessage({ text, images, context });
+
+        let finalText = text;
+        let displayText: string | undefined = undefined;
+
+        if (att) {
+            const docContent = resolveAttachmentText(att);
+            finalText = text ? `${text}\n\n[附件材料：${att.title}]\n${docContent}` : `[附件材料：${att.title}]\n${docContent}`;
+            displayText = text ? `${text}\n📄 [文件卡：${att.title}]` : `📄 [文件卡：${att.title}]`;
+        }
+
+        await sendMascotMessage({ text: finalText, displayText, images, context });
     };
 
     const handleGenerateReply = async () => {
@@ -1108,6 +1124,14 @@ export function MascotChatRoom({ onBack, onDeleted }: MascotChatRoomProps) {
             </div>
 
             <div className="chat-input-bar chat-room-main-pane flex flex-col" data-ui="input">
+                {pendingDocAttachment && (
+                    <div style={{ padding: "8px 12px 0" }}>
+                        <ChatDocAttachmentPendingBar
+                            attachment={pendingDocAttachment}
+                            onRemove={() => setPendingDocAttachment(null)}
+                        />
+                    </div>
+                )}
                 {pendingImages.length > 0 && (
                     <div className="mascot-pending-strip">
                         {pendingImages.map((ref, idx) => {
@@ -1177,6 +1201,15 @@ export function MascotChatRoom({ onBack, onDeleted }: MascotChatRoomProps) {
                     </label>
                     <button
                         type="button"
+                        onClick={() => setShowDocImport(true)}
+                        className="ui-bare-btn text-[var(--c-text)]"
+                        title="导入文档 / 从文件库导入"
+                        aria-label="导入文档"
+                    >
+                        <FileText size={24} strokeWidth={1.5} />
+                    </button>
+                    <button
+                        type="button"
                         onClick={() => setShowEmojiPanel((prev) => !prev)}
                         className="ui-bare-btn text-[var(--c-text)]"
                         aria-label="表情"
@@ -1234,6 +1267,21 @@ export function MascotChatRoom({ onBack, onDeleted }: MascotChatRoomProps) {
                     onClose={() => setPreviewImageUrl(null)}
                 />
             )}
+
+            <ChatDocImport
+                isOpen={showDocImport}
+                onClose={() => setShowDocImport(false)}
+                onAttach={(att) => {
+                    setPendingDocAttachment(att);
+                }}
+                onInsertText={(text) => {
+                    setInputText((prev) => (prev ? prev + "\n" + text : text));
+                    requestAnimationFrame(() => {
+                        resizeTextarea();
+                        textareaRef.current?.focus();
+                    });
+                }}
+            />
         </div>
     );
 }

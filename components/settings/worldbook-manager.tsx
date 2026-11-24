@@ -14,6 +14,8 @@ import { loadCharacters } from "@/lib/character-storage";
 import type { WorldBookConfig, WorldBookEntry } from "@/lib/settings-types";
 import { SettingsContext } from "../phone-settings-app";
 import { BottomSheet, ConfirmDialog, TextExpandModal } from "@/components/ui/modal";
+import { WorldBookFileVaultModal } from "./worldbook-file-vault";
+import { FileText } from "lucide-react";
 import { SwipeActionRow, useSwipeActions } from "@/components/ui/swipe-actions";
 import { notifyMascotPageContext } from "@/lib/mascot-events";
 
@@ -26,6 +28,7 @@ export function WorldBookManager({ isActive = true }: { isActive?: boolean } = {
     const [isLoaded, setIsLoaded] = useState(false);
     const [expandUid, setExpandUid] = useState<string | null>(null);
     const [importError, setImportError] = useState<string | null>(null);
+    const [showFileVaultModal, setShowFileVaultModal] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -537,6 +540,14 @@ export function WorldBookManager({ isActive = true }: { isActive?: boolean } = {
                             <div className="flex justify-center gap-2">
                                 <button
                                     type="button"
+                                    onClick={() => setShowFileVaultModal(true)}
+                                    className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[20px] bg-blue-600 px-4 text-xs font-bold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md active:scale-95"
+                                >
+                                    <FileText size={15} strokeWidth={1.8} />
+                                    <span>从文件库导入条目</span>
+                                </button>
+                                <button
+                                    type="button"
                                     onClick={() => handleExport(activeBook)}
                                     className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[20px] bg-black px-4 text-xs font-bold text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md active:scale-95"
                                 >
@@ -905,6 +916,16 @@ export function WorldBookManager({ isActive = true }: { isActive?: boolean } = {
                             className="ui-btn ui-btn-outline w-full"
                             onClick={() => {
                                 setAddEntryMenuOpen(false);
+                                setShowFileVaultModal(true);
+                            }}
+                        >
+                            <FileText size={16} /> 从文件库导入
+                        </button>
+                        <button
+                            type="button"
+                            className="ui-btn ui-btn-outline w-full"
+                            onClick={() => {
+                                setAddEntryMenuOpen(false);
                                 entryImportModeRef.current = { mode: "append" };
                                 entryFileInputRef.current?.click();
                             }}
@@ -914,6 +935,25 @@ export function WorldBookManager({ isActive = true }: { isActive?: boolean } = {
                     </div>
                 </BottomSheet>
             )}
+
+            <WorldBookFileVaultModal
+                isOpen={showFileVaultModal}
+                onClose={() => setShowFileVaultModal(false)}
+                onImportEntries={(generated) => {
+                    const book = books.find(b => b.id === activeBookId);
+                    if (!book) return;
+                    const raws = generated.map(g => ({
+                        comment: g.name,
+                        key: g.keys.join(", "),
+                        content: g.content,
+                        enabled: g.enabled,
+                    }));
+                    appendImportedEntries(book, raws);
+                    window.dispatchEvent(new CustomEvent("global-notice", {
+                        detail: `成功从文件库导入 ${generated.length} 个条目`,
+                    }));
+                }}
+            />
 
             {expandUid && (() => {
                 const entry = activeBook?.entries?.find(e => e.uid === expandUid);
